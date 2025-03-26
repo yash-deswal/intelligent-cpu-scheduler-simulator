@@ -210,8 +210,33 @@ class CPUSchedulerGUI:
             self.time_quantum_entry.pack_forget()
 
     def start_simulation(self):
-        """ Placeholder function for starting simulation """
-        print("Simulation Started with", self.algorithm_var.get())
+        """Extract input, run selected scheduling algorithm, and display results."""
+        processes = []
+        
+        for row in self.process_entries:
+            values = [entry.get() for entry in row]
+            if all(values):  # Ensure no empty input
+                pid, arrival, burst, priority = map(int, values)
+                processes.append(Process(pid, arrival, burst, priority))
+        
+        algorithm = self.algorithm_var.get()
+        
+        if algorithm == "FCFS":
+            schedule, completed = fcfs(processes)
+        elif algorithm == "SJF (Non-Preemptive)":
+            schedule, completed = sjf_non_preemptive(processes)
+        elif algorithm == "SJF (Preemptive)":
+            schedule, completed = sjf_preemptive(processes)
+        elif algorithm == "Round Robin":
+            time_quantum = int(self.time_quantum_entry.get()) if self.time_quantum_entry.get() else 1
+            schedule, completed = round_robin(processes, time_quantum)
+        elif algorithm == "Priority (Non-Preemptive)":
+            schedule, completed = priority_non_preemptive(processes)
+        else:
+            print("Invalid algorithm selected.")
+            return
+        
+        self.display_results(schedule, completed)
 
 # Run the GUI
 if __name__ == "__main__":
