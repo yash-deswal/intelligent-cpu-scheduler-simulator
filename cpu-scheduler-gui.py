@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import heapq
 
 class Process:
     def __init__(self, pid, arrival_time, burst_time, priority=0):
@@ -59,6 +60,44 @@ def sjf_non_preemptive(processes):
             current_time += 1  # CPU idle
 
     return schedule, completed
+
+def sjf_preemptive(processes):
+    processes.sort(key=lambda x: x.arrival_time)
+    current_time = 0
+    schedule = []
+    remaining_processes = []
+    heapq.heapify(remaining_processes)
+    index = 0
+    last_pid = None
+
+    while index < len(processes) or remaining_processes:
+        while index < len(processes) and processes[index].arrival_time <= current_time:
+            heapq.heappush(remaining_processes, (processes[index].burst_time, index))
+            index += 1
+
+        if remaining_processes:
+            burst_time, idx = heapq.heappop(remaining_processes)
+            process = processes[idx]
+
+            if process.response_time == -1:
+                process.response_time = current_time - process.arrival_time
+
+            if last_pid != process.pid:
+                schedule.append((process.pid, current_time))
+
+            process.remaining_time -= 1
+            current_time += 1
+
+            if process.remaining_time > 0:
+                heapq.heappush(remaining_processes, (process.remaining_time, idx))
+            else:
+                process.completion_time = current_time
+                process.turnaround_time = process.completion_time - process.arrival_time
+                process.waiting_time = process.turnaround_time - process.burst_time
+        else:
+            current_time += 1
+
+    return schedule, processes
 
 class CPUSchedulerGUI:
     def __init__(self, root):
