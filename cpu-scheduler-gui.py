@@ -89,6 +89,84 @@ def round_robin(processes, time_quantum):
     
     return schedule, processes
 
+def priority_scheduling(processes):
+    current_time = 0
+    schedule = []
+    completed = []
+    remaining_processes = processes.copy()
+    
+    while remaining_processes:
+        available = [p for p in remaining_processes if p.arrival_time <= current_time]
+        if available:
+            # Select process with highest priority (lower number means higher priority)
+            process = min(available, key=lambda x: x.priority)
+            remaining_processes.remove(process)
+            
+            process.start_time = current_time
+            process.completion_time = current_time + process.burst_time
+            process.turnaround_time = process.completion_time - process.arrival_time
+            process.waiting_time = process.turnaround_time - process.burst_time
+            process.response_time = process.start_time - process.arrival_time
+            
+            schedule.append((process.pid, process.start_time, process.completion_time))
+            current_time += process.burst_time
+            completed.append(process)
+        else:
+            current_time += 1
+    
+    return schedule, completed
+
+def preemptive_sjf(processes):
+    current_time = 0
+    schedule = []
+    completed = []
+    remaining_processes = [Process(p.pid, p.arrival_time, p.burst_time, p.priority) for p in processes]
+    current_process = None
+    last_process = None
+    
+    while remaining_processes or current_process:
+        # Update available processes
+        available = [p for p in remaining_processes if p.arrival_time <= current_time]
+        
+        if not available and not current_process:
+            current_time += 1
+            continue
+            
+        # Find process with shortest remaining time
+        if available:
+            shortest_process = min(available, key=lambda x: x.remaining_time)
+            if not current_process or shortest_process.remaining_time < current_process.remaining_time:
+                if current_process:
+                    remaining_processes.append(current_process)
+                current_process = shortest_process
+                remaining_processes.remove(shortest_process)
+                
+                # If process changed, add to schedule
+                if current_process != last_process:
+                    if last_process and schedule:
+                        schedule[-1] = (last_process.pid, schedule[-1][1], current_time)
+                    schedule.append((current_process.pid, current_time, None))
+                    if current_process.response_time == -1:
+                        current_process.response_time = current_time - current_process.arrival_time
+        
+        # Execute current process
+        if current_process:
+            current_process.remaining_time -= 1
+            if current_process.remaining_time == 0:
+                current_process.completion_time = current_time + 1
+                current_process.turnaround_time = current_process.completion_time - current_process.arrival_time
+                current_process.waiting_time = current_process.turnaround_time - current_process.burst_time
+                completed.append(current_process)
+                schedule[-1] = (current_process.pid, schedule[-1][1], current_time + 1)
+                last_process = None
+                current_process = None
+            else:
+                last_process = current_process
+                
+        current_time += 1
+    
+    return schedule, completed
+
 class CPUSchedulerGUI:
     def __init__(self, root):
         self.root = root
@@ -101,24 +179,49 @@ class CPUSchedulerGUI:
         self.setup_ui()
     
     def setup_ui(self):
-        tk.Label(self.root, text="Process Details (PID, Arrival, Burst, Priority)").pack()
+        # Main title
+        tk.Label(self.root, text="CPU Scheduling Simulator", font=('Arial', 14, 'bold')).pack(pady=10)
+        
+        # Create frame for process entries
         self.entry_frame = tk.Frame(self.root)
-        self.entry_frame.pack()
+        self.entry_frame.pack(padx=20, pady=10)
         
-        for _ in range(4):
-            row = [tk.Entry(self.entry_frame, width=10) for _ in range(4)]
-            for entry in row:
-                entry.pack(side="left", padx=5)
-            self.process_entries.append(row)
+        # Column headers
+        headers = ['PID', 'Arrival Time', 'Burst Time', 'Priority']
+        for col, header in enumerate(headers):
+            tk.Label(self.entry_frame, text=header, font=('Arial', 10, 'bold')).grid(row=0, column=col+1, padx=5, pady=5)
         
-        tk.Label(self.root, text="Select Algorithm:").pack()
-        ttk.Combobox(self.root, textvariable=self.algorithm_var, values=["FCFS", "SJF (Non-Preemptive)", "Round Robin"]).pack()
+        # Process rows
+        self.process_entries = []
+        for row in range(4):
+            # Process label
+            tk.Label(self.entry_frame, text=f"Process {row + 1}:", font=('Arial', 10)).grid(row=row+1, column=0, padx=5, pady=5)
+            
+            # Entry fields
+            process_row = []
+            for col in range(4):
+                entry = tk.Entry(self.entry_frame, width=10)
+                entry.grid(row=row+1, column=col+1, padx=5, pady=5)
+                process_row.append(entry)
+            self.process_entries.append(process_row)
         
-        self.time_quantum_entry = tk.Entry(self.root, width=10)
-        tk.Label(self.root, text="Time Quantum (RR)").pack()
-        self.time_quantum_entry.pack()
+        # Algorithm selection
+        algorithm_frame = tk.Frame(self.root)
+        algorithm_frame.pack(pady=10)
+        tk.Label(algorithm_frame, text="Select Algorithm:").pack(side="left", padx=5)
+        ttk.Combobox(algorithm_frame, textvariable=self.algorithm_var, 
+                    values=["FCFS", "SJF (Non-Preemptive)", "SJF (Preemptive)", "Round Robin", "Priority"]).pack(side="left", padx=5)
         
-        tk.Button(self.root, text="Start Simulation", command=self.start_simulation).pack()
+        # Time Quantum input for Round Robin
+        quantum_frame = tk.Frame(self.root)
+        quantum_frame.pack(pady=10)
+        tk.Label(quantum_frame, text="Time Quantum (RR):").pack(side="left", padx=5)
+        self.time_quantum_entry = tk.Entry(quantum_frame, width=10)
+        self.time_quantum_entry.pack(side="left", padx=5)
+        
+        # Start button
+        tk.Button(self.root, text="Start Simulation", command=self.start_simulation,
+                 font=('Arial', 10, 'bold')).pack(pady=10)
     
     def start_simulation(self):
         processes = []
@@ -134,9 +237,13 @@ class CPUSchedulerGUI:
             schedule, completed = fcfs(processes)
         elif algorithm == "SJF (Non-Preemptive)":
             schedule, completed = sjf_non_preemptive(processes)
+        elif algorithm == "SJF (Preemptive)":
+            schedule, completed = preemptive_sjf(processes)
         elif algorithm == "Round Robin":
             time_quantum = int(self.time_quantum_entry.get()) if self.time_quantum_entry.get() else 1
             schedule, completed = round_robin(processes, time_quantum)
+        elif algorithm == "Priority":
+            schedule, completed = priority_scheduling(processes)
         else:
             return
         
