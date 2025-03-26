@@ -133,6 +133,31 @@ def round_robin(processes, time_quantum):
 
     return schedule, processes
 
+def priority_non_preemptive(processes):
+    processes.sort(key=lambda x: (x.arrival_time, x.priority))
+    current_time = 0
+    schedule = []
+    completed = []
+
+    while processes:
+        available = [p for p in processes if p.arrival_time <= current_time]
+        if available:
+            process = min(available, key=lambda x: x.priority)
+            processes.remove(process)
+
+            process.start_time = current_time
+            process.completion_time = current_time + process.burst_time
+            process.turnaround_time = process.completion_time - process.arrival_time
+            process.waiting_time = process.turnaround_time - process.burst_time
+
+            schedule.append((process.pid, process.start_time, process.completion_time))
+            current_time += process.burst_time
+            completed.append(process)
+        else:
+            current_time += 1
+
+    return schedule, completed
+
 class CPUSchedulerGUI:
     def __init__(self, root):
         self.root = root
