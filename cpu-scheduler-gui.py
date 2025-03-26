@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import heapq
+from collections import deque
 
 class Process:
     def __init__(self, pid, arrival_time, burst_time, priority=0):
@@ -96,6 +97,39 @@ def sjf_preemptive(processes):
                 process.waiting_time = process.turnaround_time - process.burst_time
         else:
             current_time += 1
+
+    return schedule, processes
+
+def round_robin(processes, time_quantum):
+    queue = deque()
+    schedule = []
+    current_time = 0
+    processes.sort(key=lambda x: x.arrival_time)
+    index = 0
+
+    while index < len(processes) or queue:
+        while index < len(processes) and processes[index].arrival_time <= current_time:
+            queue.append(processes[index])
+            index += 1
+
+        if queue:
+            process = queue.popleft()
+            if process.response_time == -1:
+                process.response_time = current_time - process.arrival_time
+
+            execution_time = min(time_quantum, process.remaining_time)
+            process.remaining_time -= execution_time
+            schedule.append((process.pid, current_time, current_time + execution_time))
+            current_time += execution_time
+
+            if process.remaining_time > 0:
+                queue.append(process)
+            else:
+                process.completion_time = current_time
+                process.turnaround_time = process.completion_time - process.arrival_time
+                process.waiting_time = process.turnaround_time - process.burst_time
+        else:
+            current_time += 1  # CPU idle
 
     return schedule, processes
 
