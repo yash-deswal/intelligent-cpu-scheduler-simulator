@@ -57,12 +57,9 @@ To enhance understanding, users are encouraged to capture screenshots of the app
 - **Gantt Chart Animation**: Captures the animated Gantt chart during execution, highlighting the flowing effect with the red time line and colored process bars.
 - **Process Table**: Displays the updated metrics post-simulation, offering a tabular view for analysis.
 
-Users should save these images in a `screenshots/` folder within the project directory and update the README with paths like `![Main Interface](screenshots/main_interface.png)` to include them, enhancing the documentation visually.
 
 
-
-![Alt text](screenshots/main_interface.png)
-
+![Main Interface](https://github.com/yash-deswal/intelligent-cpu-scheduler-simulator/blob/main/screenshots/main_interface.png?raw=true)
 
 
 
