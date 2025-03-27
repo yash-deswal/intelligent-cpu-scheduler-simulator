@@ -59,6 +59,13 @@ To enhance understanding, users are encouraged to capture screenshots of the app
 
 Users should save these images in a `screenshots/` folder within the project directory and update the README with paths like `![Main Interface](screenshots/main_interface.png)` to include them, enhancing the documentation visually.
 
+
+
+![Alt text](screenshots/main_interface.png)
+
+
+
+
 #### Contributing to the Project
 The project welcomes contributions to improve functionality or fix issues:
 - **Fork the Repository**: Create a personal copy on GitHub.
