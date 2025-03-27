@@ -4,7 +4,7 @@ import random
 import csv
 from collections import deque
 
-# Process class to hold process attributes
+
 class Process:
     def __init__(self, pid, arrival_time, burst_time, priority=0):
         self.pid = pid
@@ -18,7 +18,7 @@ class Process:
         self.turnaround_time = 0
         self.response_time = -1
 
-# Existing scheduling algorithms
+
 def fcfs_scheduling(processes):
     processes.sort(key=lambda x: x.arrival_time)
     current_time = 0
@@ -115,7 +115,7 @@ def priority_scheduling(processes):
     
     return schedule, completed
 
-# New Preemptive SJF algorithm
+
 def preemptive_sjf(processes):
     current_time = 0
     schedule = []
@@ -125,14 +125,14 @@ def preemptive_sjf(processes):
     last_process = None
     
     while remaining_processes or current_process:
-        # Update available processes
+        
         available = [p for p in remaining_processes if p.arrival_time <= current_time]
         
         if not available and not current_process:
             current_time += 1
             continue
             
-        # Find process with shortest remaining time
+        
         if available:
             shortest_process = min(available, key=lambda x: x.remaining_time)
             if not current_process or shortest_process.remaining_time < current_process.remaining_time:
@@ -149,7 +149,7 @@ def preemptive_sjf(processes):
                     if current_process.response_time == -1:
                         current_process.response_time = current_time - current_process.arrival_time
         
-        # Execute current process
+        
         if current_process:
             current_process.remaining_time -= 1
             if current_process.remaining_time == 0:
@@ -167,7 +167,7 @@ def preemptive_sjf(processes):
     
     return schedule, completed
 
-# Scheduler GUI class
+
 class SchedulerGUI:
     def __init__(self, root):
         self.root = root
@@ -175,17 +175,17 @@ class SchedulerGUI:
         self.root.configure(bg="#1e1e1e")
         self.process_list = []
 
-        # Style configuration
+        
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("TButton", font=("Arial", 10, "bold"), padding=6, background="#007BFF", foreground="white")
         style.map("TButton", background=[("active", "#0056b3")])
         style.configure("TCombobox", padding=5)
 
-        # Heading
+        
         tk.Label(root, text="CPU Scheduler Simulator", font=("Arial", 16, "bold"), fg="white", bg="#1e1e1e").grid(row=0, column=0, columnspan=6, pady=10)
 
-        # Input fields
+       
         tk.Label(root, text="PID", fg="white", bg="#1e1e1e").grid(row=1, column=0)
         tk.Label(root, text="Arrival", fg="white", bg="#1e1e1e").grid(row=1, column=1)
         tk.Label(root, text="Burst", fg="white", bg="#1e1e1e").grid(row=1, column=2)
@@ -203,45 +203,45 @@ class SchedulerGUI:
         self.add_button = ttk.Button(root, text="Add Process", command=self.add_process)
         self.add_button.grid(row=2, column=4, padx=5)
 
-        # Algorithm selection with Preemptive SJF added
+        
         self.algo_var = tk.StringVar()
         self.algo_dropdown = ttk.Combobox(root, textvariable=self.algo_var, values=["FCFS", "SJF", "Preemptive SJF", "Round Robin", "Priority"], state="readonly")
         self.algo_dropdown.grid(row=3, column=0, columnspan=2, pady=5)
         self.algo_dropdown.set("FCFS")
 
-        # Time quantum for Round Robin
+        
         tk.Label(root, text="Time Quantum", fg="white", bg="#1e1e1e").grid(row=3, column=2)
         self.quantum_entry = ttk.Entry(root, width=10)
         self.quantum_entry.grid(row=3, column=3, padx=5)
 
-        # Buttons
+        
         self.run_button = ttk.Button(root, text="Run", command=self.run_scheduler)
         self.run_button.grid(row=3, column=4, pady=5)
         self.reset_button = ttk.Button(root, text="Reset", command=self.reset_scheduler)
         self.reset_button.grid(row=3, column=5, pady=5)
 
-        # Animation speed control
+        
         tk.Label(root, text="Animation Speed", fg="white", bg="#1e1e1e").grid(row=6, column=0)
         self.speed_scale = ttk.Scale(root, from_=1, to=100, orient="horizontal")
         self.speed_scale.set(15)
         self.speed_scale.grid(row=6, column=1, columnspan=4, pady=5)
 
-        # Export button
+       
         self.export_button = ttk.Button(root, text="Export Results", command=self.export_results)
         self.export_button.grid(row=6, column=5, pady=5)
 
-        # Process table
+       
         self.tree = ttk.Treeview(root, columns=("PID", "Arrival", "Burst", "Priority", "Waiting", "Turnaround", "Completion", "Response"), show="headings", height=8)
         for col in ("PID", "Arrival", "Burst", "Priority", "Waiting", "Turnaround", "Completion", "Response"):
             self.tree.heading(col, text=col)
             self.tree.column(col, width=90, anchor="center")
         self.tree.grid(row=4, column=0, columnspan=6, pady=10, padx=10)
 
-        # Table styling
+       
         self.tree.tag_configure("oddrow", background="#2b2b2b", foreground="white")
         self.tree.tag_configure("evenrow", background="#3b3b3b", foreground="white")
 
-        # Gantt chart canvas
+        
         self.canvas = tk.Canvas(root, width=700, height=150, bg="black", highlightthickness=2, highlightbackground="white")
         self.canvas.grid(row=5, column=0, columnspan=6, pady=10)
 
@@ -295,7 +295,7 @@ class SchedulerGUI:
                 messagebox.showerror("Invalid Algorithm", "Selected algorithm is not supported.")
                 return
 
-            # Update table with results
+            
             self.tree.delete(*self.tree.get_children())
             for idx, p in enumerate(processes):
                 tag = "evenrow" if idx % 2 == 0 else "oddrow"
@@ -304,7 +304,7 @@ class SchedulerGUI:
                     p.waiting_time, p.turnaround_time, p.completion_time, p.response_time
                 ), tags=(tag,))
 
-            # Animate Gantt chart
+            
             self.animate_execution(schedule)
 
         except ValueError as e:
