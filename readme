@@ -1,1 +1,77 @@
-hello , ChiragThukran joining project .....
+### Key Points
+- The CPU Scheduler Simulator GUI is a Python-based tool for simulating and visualizing CPU scheduling algorithms, using Tkinter for the interface.
+- It supports FCFS, SJF (non-preemptive and preemptive), Round Robin, and Priority Scheduling, with features like process input, Gantt chart animation, and CSV export.
+- Installation requires Python 3.x, and the tool runs via a simple command, with no additional dependencies beyond Tkinter, which is included in standard Python.
+
+#### Project Overview
+This project provides an interactive GUI for educational purposes, allowing users to input process details, select algorithms, and visualize execution timelines. The Gantt chart animation helps demonstrate how different scheduling strategies work, making it ideal for learning CPU scheduling concepts.
+
+#### Installation and Usage
+To install, clone the repository and run the simulator with Python 3. Usage involves adding processes, selecting an algorithm, and running the simulation, with adjustable animation speed and export options for results.
+
+#### Unexpected Detail
+While the tool focuses on visualization, it also includes a process table for detailed metrics, which might be unexpected for users expecting only graphical output, enhancing its utility for analysis.
+
+---
+
+### Survey Note: Detailed Project Documentation
+
+The CPU Scheduler Simulator GUI is a Python-based graphical user interface application designed to simulate and visualize CPU scheduling algorithms, catering to educational and demonstration needs in operating systems studies. This tool leverages the `tkinter` library, which is part of the standard Python distribution, ensuring accessibility for users with minimal setup. The project supports a range of scheduling algorithms, including First-Come, First-Served (FCFS), Shortest Job First (SJF) in both non-preemptive and preemptive variants, Round Robin with configurable time quantum, and Priority Scheduling (non-preemptive). These features enable users to explore how different CPU scheduling strategies impact process execution and system performance.
+
+#### Project Features
+The simulator offers a comprehensive set of features to facilitate interactive learning and visualization:
+- **Supported Algorithms**: 
+  - FCFS: Executes processes in order of arrival, non-preemptively.
+  - SJF (Non-Preemptive): Prioritizes the shortest burst time among available processes.
+  - Preemptive SJF: Allows interruption if a new process with shorter remaining time arrives, optimizing for shortest remaining time first.
+  - Round Robin: Implements time-sliced preemptive scheduling, requiring a user-defined time quantum for fair process rotation.
+  - Priority Scheduling: Non-preemptively schedules based on priority, where lower values indicate higher priority.
+- **Interactive GUI**: Users can add processes by entering details such as PID, arrival time, burst time, and priority, select algorithms via a dropdown menu, and adjust animation speed using a slider for a tailored experience.
+- **Visualization**: The Gantt chart animation provides a flowing effect, with a red line indicating current time and colored bars for each process, labeled clearly for easy tracking. This visual representation helps in understanding process execution timelines.
+- **Process Table**: Displays detailed metrics including waiting time, turnaround time, completion time, and response time, updating dynamically after each simulation run, which enhances analytical capabilities beyond mere visualization.
+- **Export Functionality**: Allows users to save process metrics to a CSV file, facilitating further analysis or documentation, which is particularly useful for academic or research purposes.
+
+#### Installation Process
+To set up the CPU Scheduler Simulator GUI, users need Python 3.x installed, with no additional dependencies beyond `tkinter`, which is included in the standard Python distribution. The installation steps are straightforward:
+- **Clone the Repository**: Use the command `git clone https://github.com/yash-deswal/intelligent-cpu-scheduler-simulator.git` and navigate to the directory with `cd cpu-scheduler-simulator`.
+- **Run the Simulator**: Execute `python3 scheduler.py` to launch the GUI, ensuring a seamless start without requiring external package installations.
+
+This simplicity in setup ensures that users, especially students or educators, can quickly begin exploring CPU scheduling concepts without technical hurdles.
+
+#### Usage Guide
+The usage of the simulator is intuitive, designed for users with basic computer literacy:
+- **Launch the Application**: Run `python3 scheduler.py` to open the GUI, presenting input fields, algorithm selection, and visualization areas.
+- **Add Processes**: Enter a unique PID, arrival time, burst time, and priority in the respective fields, then click "Add Process" to include it in the simulation, with the process appearing in the table.
+- **Select an Algorithm**: Choose from the dropdown menu (e.g., "FCFS", "Preemptive SJF"), and for Round Robin, input a positive integer in the Time Quantum field to set the time slice.
+- **Run the Scheduler**: Click "Run" to execute the selected algorithm, triggering the Gantt chart animation, which shows process execution with a red line moving across to indicate current time, and process bars filling accordingly.
+- **Adjust Animation Speed**: Use the slider labeled "Animation Speed" to control the pace, with values from 1 (fastest) to 100 (slowest), allowing users to observe details at their preferred speed.
+- **View Results**: The Gantt chart animates dynamically, and the process table updates with metrics like waiting time (time spent waiting in the queue), turnaround time (total time from arrival to completion), completion time (when the process finishes), and response time (time from arrival to first execution), providing a comprehensive view of performance.
+- **Export Results**: Click "Export Results" to save the current process metrics to a CSV file, useful for further analysis or reporting.
+- **Reset**: Click "Reset" to clear all data, including the process list and table, allowing users to start a new simulation from scratch.
+
+This workflow ensures users can experiment with different scenarios, observe outcomes, and export data for deeper study, making it an effective educational tool.
+
+#### Screenshots and Visual Aids
+To enhance understanding, users are encouraged to capture screenshots of the application in action:
+- **Main Interface**: Shows the input fields, algorithm dropdown, and process table, providing a snapshot of the initial state.
+- **Gantt Chart Animation**: Captures the animated Gantt chart during execution, highlighting the flowing effect with the red time line and colored process bars.
+- **Process Table**: Displays the updated metrics post-simulation, offering a tabular view for analysis.
+
+Users should save these images in a `screenshots/` folder within the project directory and update the README with paths like `![Main Interface](screenshots/main_interface.png)` to include them, enhancing the documentation visually.
+
+#### Contributing to the Project
+The project welcomes contributions to improve functionality or fix issues:
+- **Fork the Repository**: Create a personal copy on GitHub.
+- **Create a New Branch**: Use `git checkout -b feature/your-feature` for new features or `git checkout -b fix/your-fix` for bug fixes.
+- **Make Changes**: Implement your improvements, ensuring code follows Python PEP 8 style guidelines and includes comments for clarity.
+- **Commit and Push**: Commit with a descriptive message like `git commit -m "Add feature X"` and push to your branch with `git push origin feature/your-feature`.
+- **Open a Pull Request**: Submit a PR on GitHub, detailing your changes for review.
+
+This collaborative approach ensures the project evolves with community input, maintaining quality and usability.
+
+#### Licensing
+The CPU Scheduler Simulator GUI is released under the MIT License, offering permissive use, modification, and distribution. Users can find the full license details in the `LICENSE` file within the repository, ensuring compliance with open-source standards.
+
+This detailed documentation provides a comprehensive guide for users and contributors, focusing solely on the project's functionality and excluding any discussion on the Data Flow Diagram as requested.
+
+---
