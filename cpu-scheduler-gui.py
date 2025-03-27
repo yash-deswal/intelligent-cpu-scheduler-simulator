@@ -4,22 +4,21 @@ import random
 import csv
 from collections import deque
 
-# Process class to hold process attributes and metrics
+# Process class to hold process attributes
 class Process:
     def __init__(self, pid, arrival_time, burst_time, priority=0):
         self.pid = pid
         self.arrival_time = arrival_time
         self.burst_time = burst_time
         self.priority = priority
-        self.remaining_time = burst_time  # For preemptive algorithms
-        self.start_time = -1              # First time the process starts
-        self.completion_time = 0          # Time when process finishes
-        self.waiting_time = 0             # Total waiting time
-        self.turnaround_time = 0          # Completion time - Arrival time
-        self.response_time = -1           # Time from arrival to first execution
+        self.remaining_time = burst_time
+        self.start_time = -1
+        self.completion_time = 0
+        self.waiting_time = 0
+        self.turnaround_time = 0
+        self.response_time = -1
 
-# Scheduling Algorithms
-## First-Come, First-Served (Non-Preemptive)
+# Existing scheduling algorithms
 def fcfs_scheduling(processes):
     processes.sort(key=lambda x: x.arrival_time)
     current_time = 0
@@ -38,7 +37,6 @@ def fcfs_scheduling(processes):
     
     return schedule, processes
 
-## Shortest Job First (Non-Preemptive)
 def sjf_non_preemptive(processes):
     processes.sort(key=lambda x: (x.arrival_time, x.burst_time))
     current_time = 0
@@ -63,7 +61,6 @@ def sjf_non_preemptive(processes):
     
     return schedule, completed
 
-## Round Robin (Preemptive)
 def round_robin(processes, time_quantum):
     queue = deque()
     schedule = []
@@ -94,7 +91,6 @@ def round_robin(processes, time_quantum):
     
     return schedule, processes
 
-## Priority Scheduling (Non-Preemptive)
 def priority_scheduling(processes):
     current_time = 0
     schedule = []
@@ -104,7 +100,7 @@ def priority_scheduling(processes):
     while remaining_processes:
         available = [p for p in remaining_processes if p.arrival_time <= current_time]
         if available:
-            process = min(available, key=lambda x: x.priority)  # Lower priority value = higher priority
+            process = min(available, key=lambda x: x.priority)
             remaining_processes.remove(process)
             process.start_time = current_time
             process.completion_time = current_time + process.burst_time
@@ -119,30 +115,81 @@ def priority_scheduling(processes):
     
     return schedule, completed
 
-# Scheduler GUI Class
+# New Preemptive SJF algorithm
+def preemptive_sjf(processes):
+    current_time = 0
+    schedule = []
+    completed = []
+    remaining_processes = [Process(p.pid, p.arrival_time, p.burst_time, p.priority) for p in processes]
+    current_process = None
+    last_process = None
+    
+    while remaining_processes or current_process:
+        # Update available processes
+        available = [p for p in remaining_processes if p.arrival_time <= current_time]
+        
+        if not available and not current_process:
+            current_time += 1
+            continue
+            
+        # Find process with shortest remaining time
+        if available:
+            shortest_process = min(available, key=lambda x: x.remaining_time)
+            if not current_process or shortest_process.remaining_time < current_process.remaining_time:
+                if current_process:
+                    remaining_processes.append(current_process)
+                current_process = shortest_process
+                remaining_processes.remove(shortest_process)
+                
+                # If process changed, update schedule
+                if current_process != last_process:
+                    if last_process and schedule:
+                        schedule[-1] = (last_process.pid, schedule[-1][1], current_time)
+                    schedule.append((current_process.pid, current_time, None))
+                    if current_process.response_time == -1:
+                        current_process.response_time = current_time - current_process.arrival_time
+        
+        # Execute current process
+        if current_process:
+            current_process.remaining_time -= 1
+            if current_process.remaining_time == 0:
+                current_process.completion_time = current_time + 1
+                current_process.turnaround_time = current_process.completion_time - current_process.arrival_time
+                current_process.waiting_time = current_process.turnaround_time - current_process.burst_time
+                completed.append(current_process)
+                schedule[-1] = (current_process.pid, schedule[-1][1], current_time + 1)
+                last_process = None
+                current_process = None
+            else:
+                last_process = current_process
+                
+        current_time += 1
+    
+    return schedule, completed
+
+# Scheduler GUI class
 class SchedulerGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Intelligent CPU Scheduler Simulator")
-        self.root.configure(bg="#1e1e1e")  # Dark theme
+        self.root.title("CPU Scheduler Simulator")
+        self.root.configure(bg="#1e1e1e")
         self.process_list = []
 
-        # Style Configuration
+        # Style configuration
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("TButton", font=("Arial", 10, "bold"), padding=6, background="#007BFF", foreground="white")
         style.map("TButton", background=[("active", "#0056b3")])
-        style.configure("TCombobox", padding=5, fieldbackground="white", background="white")
+        style.configure("TCombobox", padding=5)
 
         # Heading
-        title_label = tk.Label(root, text="Intelligent CPU Scheduler Simulator", font=("Arial", 16, "bold"), fg="white", bg="#1e1e1e")
-        title_label.grid(row=0, column=0, columnspan=6, pady=10)
+        tk.Label(root, text="CPU Scheduler Simulator", font=("Arial", 16, "bold"), fg="white", bg="#1e1e1e").grid(row=0, column=0, columnspan=6, pady=10)
 
-        # Input Fields
-        ttk.Label(root, text="PID", foreground="white", background="#1e1e1e").grid(row=1, column=0)
-        ttk.Label(root, text="Arrival", foreground="white", background="#1e1e1e").grid(row=1, column=1)
-        ttk.Label(root, text="Burst", foreground="white", background="#1e1e1e").grid(row=1, column=2)
-        ttk.Label(root, text="Priority", foreground="white", background="#1e1e1e").grid(row=1, column=3)
+        # Input fields
+        tk.Label(root, text="PID", fg="white", bg="#1e1e1e").grid(row=1, column=0)
+        tk.Label(root, text="Arrival", fg="white", bg="#1e1e1e").grid(row=1, column=1)
+        tk.Label(root, text="Burst", fg="white", bg="#1e1e1e").grid(row=1, column=2)
+        tk.Label(root, text="Priority", fg="white", bg="#1e1e1e").grid(row=1, column=3)
 
         self.pid_entry = ttk.Entry(root, width=10)
         self.arrival_entry = ttk.Entry(root, width=10)
@@ -156,51 +203,49 @@ class SchedulerGUI:
         self.add_button = ttk.Button(root, text="Add Process", command=self.add_process)
         self.add_button.grid(row=2, column=4, padx=5)
 
-        # Algorithm Selection
+        # Algorithm selection with Preemptive SJF added
         self.algo_var = tk.StringVar()
-        self.algo_dropdown = ttk.Combobox(root, textvariable=self.algo_var, values=["FCFS", "SJF", "Round Robin", "Priority"], state="readonly")
+        self.algo_dropdown = ttk.Combobox(root, textvariable=self.algo_var, values=["FCFS", "SJF", "Preemptive SJF", "Round Robin", "Priority"], state="readonly")
         self.algo_dropdown.grid(row=3, column=0, columnspan=2, pady=5)
         self.algo_dropdown.set("FCFS")
 
-        # Time Quantum for Round Robin
-        ttk.Label(root, text="Time Quantum", foreground="white", background="#1e1e1e").grid(row=3, column=2)
+        # Time quantum for Round Robin
+        tk.Label(root, text="Time Quantum", fg="white", bg="#1e1e1e").grid(row=3, column=2)
         self.quantum_entry = ttk.Entry(root, width=10)
         self.quantum_entry.grid(row=3, column=3, padx=5)
 
         # Buttons
         self.run_button = ttk.Button(root, text="Run", command=self.run_scheduler)
         self.run_button.grid(row=3, column=4, pady=5)
-
         self.reset_button = ttk.Button(root, text="Reset", command=self.reset_scheduler)
         self.reset_button.grid(row=3, column=5, pady=5)
 
-        # Animation Speed Control
-        ttk.Label(root, text="Animation Speed", foreground="white", background="#1e1e1e").grid(row=6, column=0)
+        # Animation speed control
+        tk.Label(root, text="Animation Speed", fg="white", bg="#1e1e1e").grid(row=6, column=0)
         self.speed_scale = ttk.Scale(root, from_=1, to=100, orient="horizontal")
-        self.speed_scale.set(15)  # Default speed
+        self.speed_scale.set(15)
         self.speed_scale.grid(row=6, column=1, columnspan=4, pady=5)
 
-        # Export Results Button
+        # Export button
         self.export_button = ttk.Button(root, text="Export Results", command=self.export_results)
         self.export_button.grid(row=6, column=5, pady=5)
 
-        # Process Table
+        # Process table
         self.tree = ttk.Treeview(root, columns=("PID", "Arrival", "Burst", "Priority", "Waiting", "Turnaround", "Completion", "Response"), show="headings", height=8)
         for col in ("PID", "Arrival", "Burst", "Priority", "Waiting", "Turnaround", "Completion", "Response"):
             self.tree.heading(col, text=col)
             self.tree.column(col, width=90, anchor="center")
         self.tree.grid(row=4, column=0, columnspan=6, pady=10, padx=10)
 
-        # Table Styling
+        # Table styling
         self.tree.tag_configure("oddrow", background="#2b2b2b", foreground="white")
         self.tree.tag_configure("evenrow", background="#3b3b3b", foreground="white")
 
-        # Gantt Chart Canvas
+        # Gantt chart canvas
         self.canvas = tk.Canvas(root, width=700, height=150, bg="black", highlightthickness=2, highlightbackground="white")
         self.canvas.grid(row=5, column=0, columnspan=6, pady=10)
 
     def add_process(self):
-        """Add a process to the list and table."""
         try:
             pid = int(self.pid_entry.get())
             arrival = int(self.arrival_entry.get())
@@ -227,7 +272,6 @@ class SchedulerGUI:
             messagebox.showerror("Invalid Input", "Please enter valid integer values!")
 
     def run_scheduler(self):
-        """Run the selected scheduling algorithm and update the display."""
         algo = self.algo_var.get()
         if not self.process_list:
             messagebox.showerror("No Processes", "Please add at least one process before running the scheduler.")
@@ -238,6 +282,8 @@ class SchedulerGUI:
                 schedule, processes = fcfs_scheduling(self.process_list[:])
             elif algo == "SJF":
                 schedule, processes = sjf_non_preemptive(self.process_list[:])
+            elif algo == "Preemptive SJF":  # New condition for Preemptive SJF
+                schedule, processes = preemptive_sjf(self.process_list[:])
             elif algo == "Round Robin":
                 quantum = int(self.quantum_entry.get())
                 if quantum <= 0:
@@ -267,7 +313,6 @@ class SchedulerGUI:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
     def reset_scheduler(self):
-        """Reset all data and clear the display."""
         self.process_list.clear()
         self.tree.delete(*self.tree.get_children())
         self.canvas.delete("all")
@@ -278,7 +323,6 @@ class SchedulerGUI:
         self.quantum_entry.delete(0, tk.END)
 
     def animate_execution(self, schedule):
-        """Animate the Gantt chart based on the schedule."""
         self.canvas.delete("all")
         scale = 30  # Pixels per time unit
         y_top = 40
@@ -297,21 +341,20 @@ class SchedulerGUI:
                 current_x = x_start + (step + 1) * scale
                 self.canvas.coords(rect, x_start, y_top, current_x, y_bottom)
                 self.root.update()
-                self.root.after(int(self.speed_scale.get()))  # Adjustable speed
+                self.root.after(int(self.speed_scale.get()))
 
             # Add PID text
             self.canvas.create_text((x_start + x_end) / 2, (y_top + y_bottom) / 2, text=f"P{pid}", font=("Arial", 12, "bold"), fill="white")
 
-            # Add time labels, handling gaps
+            # Add time labels
             if start != previous_end or start == 0:
                 self.canvas.create_text(x_start, y_bottom + 20, text=f"{start}", font=("Arial", 10), fill="white")
             self.canvas.create_text(x_end, y_bottom + 20, text=f"{end}", font=("Arial", 10), fill="white")
             previous_end = end
 
-        self.canvas.create_text(350, 120, text="🎉 Execution Completed! 🎉", fill="green", font=("Arial", 14, "bold"))
+        self.canvas.create_text(350, 120, text="Execution Completed!", fill="green", font=("Arial", 14, "bold"))
 
     def export_results(self):
-        """Export process metrics to a CSV file."""
         if not self.process_list:
             messagebox.showerror("No Data", "No processes to export.")
             return
