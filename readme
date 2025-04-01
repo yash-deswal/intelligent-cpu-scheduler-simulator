@@ -1,22 +1,26 @@
-### Key Points
-- The CPU Scheduler Simulator GUI is a Python-based tool for simulating and visualizing CPU scheduling algorithms, using Tkinter for the interface.
-- It supports FCFS, SJF (non-preemptive and preemptive), Round Robin, and Priority Scheduling, with features like process input, Gantt chart animation, and CSV export.
-- Installation requires Python 3.x, and the tool runs via a simple command, with no additional dependencies beyond Tkinter, which is included in standard Python.
+## Developed by
+### CHIRAG, YASH, AYUSH 
 
-#### Project Overview
-This project provides an interactive GUI for educational purposes, allowing users to input process details, select algorithms, and visualize execution timelines. The Gantt chart animation helps demonstrate how different scheduling strategies work, making it ideal for learning CPU scheduling concepts.
 
-#### Installation and Usage
-To install, clone the repository and run the simulator with Python 3. Usage involves adding processes, selecting an algorithm, and running the simulation, with adjustable animation speed and export options for results.
+# Key Points
+### The CPU Scheduler Simulator GUI is a Python-based tool for simulating and visualizing CPU scheduling algorithms, using Tkinter for the interface.
+### It supports FCFS, SJF (non-preemptive and preemptive), Round Robin, and Priority Scheduling, with features like process input, Gantt chart animation, and CSV export.
+### Installation requires Python 3.x, and the tool runs via a simple command, with no additional dependencies beyond Tkinter, which is included in standard Python.
 
-#### Unexpected Detail
-While the tool focuses on visualization, it also includes a process table for detailed metrics, which might be unexpected for users expecting only graphical output, enhancing its utility for analysis.
+# Project Overview
+### This project provides an interactive GUI for educational purposes, allowing users to input process details, select algorithms, and visualize execution timelines. The Gantt chart animation helps demonstrate how different scheduling strategies work, making it ideal for learning CPU scheduling concepts.
+
+# Installation and Usage
+### To install, clone the repository and run the simulator with Python 3. Usage involves adding processes, selecting an algorithm, and running the simulation, with adjustable animation speed and export options for results.
+
+# Unexpected Detail
+### While the tool focuses on visualization, it also includes a process table for detailed metrics, which might be unexpected for users expecting only graphical output, enhancing its utility for analysis.
 
 ---
 
-### Survey Note: Detailed Project Documentation
+# Survey Note: Detailed Project Documentation
 
-The CPU Scheduler Simulator GUI is a Python-based graphical user interface application designed to simulate and visualize CPU scheduling algorithms, catering to educational and demonstration needs in operating systems studies. This tool leverages the `tkinter` library, which is part of the standard Python distribution, ensuring accessibility for users with minimal setup. The project supports a range of scheduling algorithms, including First-Come, First-Served (FCFS), Shortest Job First (SJF) in both non-preemptive and preemptive variants, Round Robin with configurable time quantum, and Priority Scheduling (non-preemptive). These features enable users to explore how different CPU scheduling strategies impact process execution and system performance.
+### The CPU Scheduler Simulator GUI is a Python-based graphical user interface application designed to simulate and visualize CPU scheduling algorithms, catering to educational and demonstration needs in operating systems studies. This tool leverages the `tkinter` library, which is part of the standard Python distribution, ensuring accessibility for users with minimal setup. The project supports a range of scheduling algorithms, including First-Come, First-Served (FCFS), Shortest Job First (SJF) in both non-preemptive and preemptive variants, Round Robin with configurable time quantum, and Priority Scheduling (non-preemptive). These features enable users to explore how different CPU scheduling strategies impact process execution and system performance.
 
 #### Project Features
 The simulator offers a comprehensive set of features to facilitate interactive learning and visualization:
